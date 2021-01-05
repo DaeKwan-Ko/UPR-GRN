@@ -1,0 +1,2 @@
+### fastqc
+fastqc -o /mnt/home/dkko/project_bzip28bzip60/RNAseq_bzip28bzip60/2_fastqc/before_cleaning -f fastq ${myfile}.fastq

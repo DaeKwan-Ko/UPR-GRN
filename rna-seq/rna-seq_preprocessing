@@ -1,2 +1,7 @@
 ### fastqc
 fastqc -o /mnt/home/dkko/project_bzip28bzip60/RNAseq_bzip28bzip60/2_fastqc/before_cleaning -f fastq ${myfile}.fastq
+
+### cutadapt
+cutadapt -f fastq -q 20,20 -u 2 -m 30 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC \
+-g AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT \
+-o /mnt/home/dkko/project_bzip28bzip60/RNAseq_bzip28bzip60/3_cutadapt_clenaing/${myfile}_cutadapt.fastq ${myfile}.fastq

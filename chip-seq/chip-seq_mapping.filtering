@@ -1,0 +1,15 @@
+
+#------------------------------------------------------------------------------------
+# Aim: mapping of cleaned 50-nt single-end ChIP-seq data to the TAIR10 genome and filtering
+# Author: Dae Kwan Ko (dkko@msu.edu)
+# Last modified: 01-11-2021
+# Usage: shown below
+#------------------------------------------------------------------------------------
+
+### index TAIR10 (chr only) for bowtie1.1.2
+bowtie-build -f ${INPUT} ${OUTPUT}
+
+### mapping to the TAIR10 genome with bowtie1
+bowtie -n 2 -m 3 -k 1 --threads 5 --best --chunkmbs 256 -q -S ${CHROMOSOME_DIRECTORY} ${INPUT} > ${OUTPUT}
+
+### converting sam files to bam files

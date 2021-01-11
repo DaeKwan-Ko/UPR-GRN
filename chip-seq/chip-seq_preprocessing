@@ -1,1 +1,24 @@
-#####
+#------------------------------------------------------------------------------------
+# Aim: preprocessing of 50-nt single-end ChIP-seq data for further analysis
+# Author: Dae Kwan Ko (dkko@msu.edu)
+# Last modified: 01-11-2021
+# Usage: shown below
+#------------------------------------------------------------------------------------
+
+### examples of fastq files
+INPUT="/mnt/home/dkko/project_1/1_raw_files/${LINE}_R1_001.fastq.gz"
+OUTPUT="/mnt/home/dkko/project_1/3_cleaned_files/${LINE}_cutadapt.fastq"
+
+### m5sum check
+md5sum ${INPUT} > ${INPUT}_md5sum.txt
+
+### fastqc of raw data
+fastqc -o ${OUTPUT} -f fastq ${INPUT}
+
+### cutadapt
+cutadapt -f fastq -q 20,20 -u 2 -m 30 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC \
+-g AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT \
+-o ${OUTPUT} ${INPUT}
+
+### fastqc of cleaned data
+fastqc -o ${OUTPUT} -f fastq ${INPUT}

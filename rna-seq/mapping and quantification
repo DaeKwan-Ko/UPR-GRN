@@ -34,3 +34,12 @@ samtools sort -o ${OUTPUT} ${INPUT}
 ### index accepted_hits.sort.bam
 samtools index ${INPUT}
 
+### read counts
+htseq-count --format=bam \
+--idattr=ID \
+--order=pos \
+--stranded=reverse \
+--minaqual=10 \
+--mode=union \
+--type=gene \
+${INPUT} ${GFF} > ${OUTPUT}

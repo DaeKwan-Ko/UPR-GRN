@@ -1,0 +1,103 @@
+rm(list=ls()) # Remove everything from the R environment. Important if you have some variables saved already
+setwd("diretory")
+myFiles <- list.files(pattern = glob2rx("*htseq.txt"), 
+                      all.files = T, 
+                      full.names = F) # Create a vector containing the names of your files
+
+# rename mock files "0..." for the convinience in coming analysis
+
+myFiles # myFiles is the list of files in your working directory which match the pattern *_htseq.txt.
+myData <- lapply(myFiles, # Use list apply to apply the native R functi on read.table() to myFiles
+                 read.table, colClasses=c("character", "numeric"))
+myData
+names(myData) <-c("ctrl_rep1", # Name the elements of myData
+                  "ctrl_rep2",
+                  "ctrl_rep3",
+                  "treat_rep1",
+                  "treat_rep2",
+                  "treat_rep3")
+
+summary(myData)
+head(myData$ctrl_rep1)
+tail(myData$ctrl_rep1) # Notice there is some metadata printed there that we should remove or those will be counted as gene names and expression counts
+rmLines <- function(x){x <- x[1:28775,]} ## This is a really quick and dirty solution. This is a function to select the first xxxxx lines.
+myData <- lapply(myData, rmLines) #Apply the rmLines() function to each object in the myData list.
+nrow(myData$ctrl_rep1) # Check to see how many lines there are in each element of myData now. There should be only 28775
+counts <- data.frame(row.names=myData$ctrl_rep1[,1],
+                     ctrl_rep1=myData$ctrl_rep1[,2],
+                     ctrl_rep2=myData$ctrl_rep2[,2],
+                     ctrl_rep3=myData$ctrl_rep3[,2],
+                     trans_rep1=myData$treat_rep1[,2],
+                     trans_rep2=myData$treat_rep2[,2],
+                     trans_rep3=myData$treat_rep3[,2])
+head(counts)                  
+geneTotals <- rowSums(counts) # Evaluate the sum of each row and save to a new vector called geneTotals
+
+#Genes with <100 reads in all samples together were discarded;
+countsNonZero <- counts[geneTotals>100,] # Subset the rows where the gene Total is greater than 100 #to get the list of all genes, >-1 was applied, because all genes should be analyzed at different time-points.
+nrow(countsNonZero) # See how many genes are left in the analysis
+treatment <- as.factor(c(rep("ctrl",3), rep("treat",3)))
+design <- model.matrix(~treatment)
+
+# BiocManager::install(c("limma", "edgeR", "DESeq2"))
+library("limma")
+library("edgeR")
+
+dge <- DGEList(counts=countsNonZero, 
+               group=treatment, 
+               remove.zeros=T) 
+plotMDS(dge,main="WT-6h MDS", 
+        pch = 19,
+        col=c(rep("black",3), 
+              rep("red",3)))
+
+library("DESeq2")
+colData <- DataFrame(treatment)
+colData
+treatment
+dds <- DESeqDataSetFromMatrix(countsNonZero, colData=colData, design=formula(~treatment))
+dds
+dds <- DESeq(dds)
+slotNames(dds)
+dds@colData
+str(dds)
+geneDispersion <- dds@rowRanges@elementMetadata@listData$dispGeneEst
+treatmentTM <- dds@rowRanges@elementMetadata@listData$treatment_treat_vs_ctrl
+plot(treatmentTM,geneDispersion, xlab="Fold change of expression (treat/ctrl)", 
+     ylab="Gene dispersion estimate", pch=19, cex=0.4)
+plotDispEsts(dds)
+
+#MA-plot
+res <- results(dds) 
+res <- lfcShrink(dds, coef=2, res=res)
+plotMA(res, ylim=c(-3.5,3.5), alpha = 0.05) #with shrinking
+plotMA(dds, ylim=c(-10,10), alpha = 0.05) #without shrinking
+
+library("RColorBrewer")
+library("gplots")
+rdds <- rlog(dds)
+plotPCA(rdds, intgroup=c("treatment"))
+plotPCA(rdds, intgroup=c("treatment"),returnData=TRUE) #to check actual numbers
+hmol <- colorRampPalette(brewer.pal(9,"Reds"))(100)
+distsRL <- dist(t(assay(rdds)))
+mat <- as.matrix(distsRL)
+rownames(mat) <- colnames(mat) <- with (colData(dds),treatment)
+heatmap.2(mat,
+          trace="none",
+          col=rev(hmol),
+          dendrogram = "col",
+          density.info = "none",
+          margins = c(10,10))
+dds_pv <- results(dds)
+dds_pv <- dds_pv[!(is.na(dds_pv$padj)),]
+#corResult <- cor(t(as.matrix(dds@assays$data$counts[dds_pv$padj < 0.05,])))
+#heatmap(corResult, cexRow = 0.5, cexCol = 0.5, margins = c(8,8))
+#heatmap(dds@assays$data$counts[dds_pv$padj < 0.05,],labCol=c("DMSO-1","DMSO-2","DMSO-3", "treat-1","treat-2","treat-3"), cexRow = 0.5, cexCol = 1.5, margins = c(8,8), Rowv = TRUE, Colv =FALSE)
+deseq2_gene_list <- as.data.frame(dds_pv[dds_pv$padj < 0.01,])        #manually remove one that has < 1 abs(log2FC)
+write.table(deseq2_gene_list, "deseq2_gene_list_xxx_greater100.txt", sep="\t")
+
+
+#to generate a list of all genes
+dds_pv <- results(dds)
+deseq2_gene_list <- as.data.frame(dds_pv)
+write.table(deseq2_gene_list, "deseq2_gene_list.txt", sep="\t")

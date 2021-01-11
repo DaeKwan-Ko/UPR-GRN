@@ -6,9 +6,7 @@
 #------------------------------------------------------------------------------------
 
 ### index TAIR10 (chr only) for bowtie2.2.3
-bowtie2-build -f \
-/mnt/home/dkko/genomes/arabidopsis_col_tair10_onlyChr/bowtie2.2.3_index/TAIR10_onlyChr.fa \
-/mnt/home/dkko/genomes/arabidopsis_col_tair10_onlyChr/bowtie2.2.3_index/TAIR10_onlyChr
+bowtie2-build -f ${INPUT} ${OUTPUT}
 
 ### mapping with tophat2 (+ bowtie2) to the TAIR10 genome
 tophat2 -o ${OUTPUT} \

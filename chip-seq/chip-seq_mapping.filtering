@@ -13,3 +13,23 @@ bowtie-build -f ${INPUT} ${OUTPUT}
 bowtie -n 2 -m 3 -k 1 --threads 5 --best --chunkmbs 256 -q -S ${CHROMOSOME_DIRECTORY} ${INPUT} > ${OUTPUT}
 
 ### converting sam files to bam files
+samtools view -S ${INPUT} -b -h -o ${OUTPUT} -@ 5
+
+### name sort
+samtools sort -m 60G -n -o ${OUTPUT} ${INPUT}
+
+### Add ms and MC tags for markdup to use later
+samtools fixmate -m ${INPUT} ${OUTPUT}
+
+### position sort
+samtools sort -m 60G -o ${OUTPUT} ${INPUT}
+
+### markdup
+samtools markdup -r -s ${INPUT} ${OUTPUT}
+
+### final sort after markdup
+samtools sort -m 60G -o ${OUTPUT} ${INPUT}
+
+### flagstat
+samtools flagstat ${INPUT} > ${OUTPUT}
+

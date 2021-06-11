@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # Aim: to find differentially expressed genes (DEGs) in each sample compared to the corresponding DMSO-only treated samples
 # Author: Dae Kwan ko (dkko@msu.edu)
-# Last modified: 01-08-2021
+# Last modified: 06-11-2021
 # Usage: shown below
 #------------------------------------------------------------------------------------
 

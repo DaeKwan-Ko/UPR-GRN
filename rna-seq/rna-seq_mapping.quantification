@@ -5,10 +5,10 @@
 # Usage: shown below
 #------------------------------------------------------------------------------------
 
-### index TAIR10 (chr only) for bowtie2.2.3
+### index TAIR10 (chr only) using bowtie2.2.3
 bowtie2-build -f ${INPUT} ${OUTPUT}
 
-### mapping with tophat2 (+ bowtie2) to the TAIR10 genome
+### mapping to the TAIR10 genome using tophat2 (+ bowtie2)
 tophat2 -o ${OUTPUT} \
 -I 15000 \
 -i 10 \
@@ -17,7 +17,7 @@ tophat2 -o ${OUTPUT} \
 /mnt/home/dkko/genomes/arabidopsis_col_tair10/TAIR10_chr_all \
 ${INPUT}
 
-### calculate fpkm with cufflinks
+### calculate fpkm using cufflinks
 cufflinks -G /mnt/home/dkko/genomes/arabidopsis_col_tair10/TAIR10_GFF3_genes.gff \
 -b /mnt/home/dkko/genomes/arabidopsis_col_tair10/TAIR10_chr_all.fa \
 --library-type fr-firststrand \
@@ -26,13 +26,13 @@ cufflinks -G /mnt/home/dkko/genomes/arabidopsis_col_tair10/TAIR10_GFF3_genes.gff
 -o ${OUTPUT} \
 ${INPUT}
 
-### sort accepted_hits.bam
+### sort accepted_hits.bam using samtools
 samtools sort -o ${OUTPUT} ${INPUT}
 
-### index accepted_hits.sort.bam
+### index accepted_hits.sort.bam using samtools
 samtools index ${INPUT}
 
-### read counts
+### read counts using htseq
 htseq-count --format=bam \
 --idattr=ID \
 --order=pos \

@@ -1,0 +1,9 @@
+#------------------------------------------------------------------------------------
+# Aim: to generate tdf files for igv visualization
+# Author: Dae Kwan Ko (dkko@msu.edu)
+# Last modified: 06-11-2021
+# Usage: shown below
+#------------------------------------------------------------------------------------
+
+### generate tdf files using igvtoools count
+igvtools count -w 5 ${INPUT} ${OUTPUT} ${GENOME}

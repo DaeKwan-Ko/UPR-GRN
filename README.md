@@ -1,8 +1,8 @@
 # UPR-GRN
 
-#The scripts provided in this repository allows to analyze raw (fastq.qz) data for RNA-seq and ChIP-seq presented in our 2021 Nature Communication paper: 
+#The scripts provided in this repository allows to analyze raw (fastq.qz) data for RNA-seq and ChIP-seq presented in our 2022 Communications Biology paper: 
 
-"Gene-regulatory network-enabled identification of effectors controlling organ growth during recovery from endoplasmic reticulum stress" 
+"Advanced genomics identifies growth effectors for proteotoxic ER stress recovery in Arabidopsis thaliana" (https://www.nature.com/articles/s42003-021-02964-8) 
 
 "rna_seq/" folder contains scripts for Quality Control, Mapping, Get Read Counts and calculate differential gene expression with DESeq2.
 We used the following versions of the programs:
